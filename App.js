@@ -31,56 +31,42 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      decks: { name: "d", age: 22 }
+      decks: {}
     };
+    this.getDate = this.getDate.bind(this);
   }
-  _storeDate = async () => {
+  componentDidMount() {
+    this.getDate();
+  }
+  getDate = () => {
     try {
-      await AsyncStorage.setItem("decks", JSON.stringify(this.state.decks));
-      await console.log(
-        AsyncStorage.getItem("decks").then(res => {
-          console.log(">>", res);
-        })
-      );
+      const decks = AsyncStorage.getItem("decks").then(res => {
+        this.setState({ decks: JSON.parse(res) });
+      });
     } catch (err) {
       console.log(err);
     }
   };
-  componentDidMount() {
-    this._storeDate();
-  }
+
   render() {
+    if (!this.state.decks)
+      return (
+        <View>
+          <Text>Not Found</Text>
+        </View>
+      );
+    const renderedItems = Object.keys(this.state.decks).map(
+      deckId => this.state.decks[deckId]
+    );
+    console.log("%%", renderedItems[0]);
+
     return (
       <View>
         <FlatList
-          data={[
-            { key: "Devin" },
-            { key: "Dan" },
-            { key: "Dominic" },
-            { key: "Jackson" },
-            { key: "James" },
-            { key: "Joel" },
-            { key: "John" },
-            { key: "Jillian" },
-            { key: "Jimmy" },
-            { key: "Julie" },
-            { key: "zDevin" },
-            { key: "zDan" },
-            { key: "zDominic" },
-            { key: "zJackson" },
-            { key: "zJames" },
-            { key: "zJoel" },
-            { key: "zJohn" },
-            { key: "zJillian" },
-            { key: "zJimmy" },
-            { key: "zJulie" }
-          ]}
-          renderItem={({ item }) => <Deck title={item.key} />}
+          data={renderedItems}
+          renderItem={({ item }) => <Deck title={item.title} />}
         >
           <Text>App</Text>
-          <Deck />
-          <Deck />
-          <Deck />
         </FlatList>
         <Button
           title="Go To Deck"

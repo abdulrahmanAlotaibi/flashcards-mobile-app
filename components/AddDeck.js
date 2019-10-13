@@ -9,21 +9,41 @@ class AddDeck extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.addDeck = this.addDeck.bind(this);
   }
-
+  async addDeck() {
+    const parker = {
+      age: 22,
+      name: "Right!"
+    };
+    const decks = AsyncStorage.getItem("decks").then(decks => {
+      console.log("&&&", JSON.parse(decks));
+      parsedDecks = JSON.parse(decks);
+      AsyncStorage.setItem(
+        "decks",
+        JSON.stringify({
+          ...parsedDecks,
+          [this.state.term]: {
+            title: this.state.term,
+            questions: []
+          }
+        })
+      );
+    });
+  }
   handleChange(text) {
     this.setState({ term: text });
-    // console.log(text);
   }
   async handleSubmit() {
+    this.addDeck();
+
     try {
-      await AsyncStorage.setItem("dddd", this.state.term).then(res => {
-        console.log(res);
-      });
-      await AsyncStorage.getItem("dddd").then(res=>{
-          console.log(res);
-          
-      })
+      // await AsyncStorage.setItem("dddd", this.state.term).then(res => {
+      //   console.log(res);
+      // });
+      // await AsyncStorage.getItem("dddd").then(res => {
+      //   console.log(res);
+      // });
     } catch (err) {
       console.log(err);
     }
