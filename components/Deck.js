@@ -14,13 +14,22 @@ class Deck extends Component {
   static navigationOptions = {
     title: "Screen Two"
   };
+  constructor(props) {
+    super(props);
+    this.handlePress = this.handlePress.bind(this);
+  }
+  handlePress() {
+    this.props.setSelectedDeck(this.props.title);
+  }
   render() {
-    console.log("**", this.props);
 
     return (
       <DeckStyles>
-        <Title>{this.props.title}</Title>
-        <Text>2 cards</Text>
+        <View >
+          <Title>{this.props.title}</Title>
+          <Text>2 cards</Text>
+          <Button title="Show Deck" onPress={() => this.handlePress()}/>
+        </View>
       </DeckStyles>
     );
   }

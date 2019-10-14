@@ -17,7 +17,7 @@ class AddDeck extends Component {
       name: "Right!"
     };
     const decks = AsyncStorage.getItem("decks").then(decks => {
-      console.log("&&&", JSON.parse(decks));
+      // console.log("&&&", JSON.parse(decks));
       parsedDecks = JSON.parse(decks);
       AsyncStorage.setItem(
         "decks",
@@ -31,8 +31,14 @@ class AddDeck extends Component {
       );
     });
   }
-  handleChange(text) {
-    this.setState({ term: text });
+  constructor(props) {
+    super(props);
+    this.state = {
+      term: ""
+    };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.addDeck = this.addDeck.bind(this);
   }
   async handleSubmit() {
     this.addDeck();
