@@ -9,4 +9,4 @@ add flashcards to those decks, then take quizzes on those decks.
   npm start
 ```
 
-## Testing Platform: Andriod
+## Testing Platform: Andriod & IOS using expo
