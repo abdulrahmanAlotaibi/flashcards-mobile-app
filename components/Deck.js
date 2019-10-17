@@ -1,34 +1,34 @@
 import React, { Component } from "react";
-import { Text, View, Button } from "react-native";
+import { Text, View, Button, Animated } from "react-native";
 import styled from "styled-components/native";
-import Card from "./Card";
+import { DeckStyles, Title, ButtonStyles } from "./styles/DeckStyles";
 
-const DeckStyles = styled.View`
-  background: pink;
-  font-size: 22px;
-`;
-const Title = styled.Text`
-  font-size: 22px;
-`;
 class Deck extends Component {
-  static navigationOptions = {
-    title: "Screen Two"
-  };
   constructor(props) {
     super(props);
+
     this.handlePress = this.handlePress.bind(this);
   }
+
   handlePress() {
     this.props.setSelectedDeck(this.props.title);
   }
   render() {
-
+    if (!this.props.deck) {
+      return (
+        <View>
+          <Text>empty</Text>
+        </View>
+      );
+    }
     return (
       <DeckStyles>
-        <View >
+        <View>
           <Title>{this.props.title}</Title>
-          <Text>2 cards</Text>
-          <Button title="Show Deck" onPress={() => this.handlePress()}/>
+          <Text>
+            {this.props.deck.questions ? this.props.deck.questions.length : 0}
+          </Text>
+          <ButtonStyles title="Show Deck" onPress={() => this.handlePress()} />
         </View>
       </DeckStyles>
     );

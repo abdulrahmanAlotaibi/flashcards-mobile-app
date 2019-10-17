@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, TextInput, View, Button, AsyncStorage } from "react-native";
-
+import { saveDeckTitle } from "../utils/api";
 class AddDeck extends Component {
   constructor(props) {
     super(props);
@@ -11,45 +11,18 @@ class AddDeck extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.addDeck = this.addDeck.bind(this);
   }
-  async addDeck() {
-    const parker = {
-      age: 22,
-      name: "Right!"
-    };
-    const decks = AsyncStorage.getItem("decks").then(decks => {
-      // console.log("&&&", JSON.parse(decks));
-      parsedDecks = JSON.parse(decks);
-      AsyncStorage.setItem(
-        "decks",
-        JSON.stringify({
-          ...parsedDecks,
-          [this.state.term]: {
-            title: this.state.term,
-            questions: []
-          }
-        })
-      );
-    });
+  async addDeck(title) {
+    saveDeckTitle(title);
   }
-  constructor(props) {
-    super(props);
-    this.state = {
-      term: ""
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.addDeck = this.addDeck.bind(this);
+  handleChange(text) {
+    this.setState({ term: text });
   }
   async handleSubmit() {
-    this.addDeck();
-
+    const title = this.state.term;
     try {
-      // await AsyncStorage.setItem("dddd", this.state.term).then(res => {
-      //   console.log(res);
-      // });
-      // await AsyncStorage.getItem("dddd").then(res => {
-      //   console.log(res);
-      // });
+      this.addDeck(title);
+      await AsyncStorage.setItem("selectedDeck", JSON.stringify(title));
+      this.props.navigation.navigate("DeckScreen");
     } catch (err) {
       console.log(err);
     }

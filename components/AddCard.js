@@ -8,38 +8,57 @@ import {
   FlatList,
   TextInput
 } from "react-native";
+import styled from "styled-components";
+import Deck from "./Deck";
+import { addCardToDeck } from "../utils/api";
+const Form = styled.View`
+  margin-top: 50px;
+`;
 class AddCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      term: ""
+      question: "",
+      answer: ""
     };
-    this.handleChange = this.handleChange.bind(this);
+    this.handleQuestionChange = this.handleQuestionChange.bind(this);
+    this.handleAnswerChange = this.handleAnswerChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.addDeck = this.addDeck.bind(this);
   }
 
-  handleChange(){
+  handleQuestionChange(text) {
+    this.setState({ question: text });
+  }
+  handleAnswerChange(text) {
+    this.setState({ answer: text });
+  }
+  handleSubmit() {
+    const card = {
+      question: this.state.question,
+      answer: this.state.answer
+    };
+    addCardToDeck(card);
 
+    this.props.navigation.navigate("DeckScreen");
   }
-  handleSubmit(){
-      
-  }
-  
+
   render() {
     return (
-      <View>
+      <Form>
         <TextInput
-          placeholder="Type your Title"
-          onChangeText={text => this.handleChange(text)}
-          value={this.state.term}
+          placeholder="Type your Question"
+          onChangeText={text => this.handleQuestionChange(text)}
+          value={this.state.question}
+          name="question"
         />
         <TextInput
-          placeholder="Type your Title"
-          onChangeText={text => this.handleChange(text)}
-          value={this.state.term}
+          placeholder="Type your Ansewr"
+          onChangeText={text => this.handleAnswerChange(text)}
+          value={this.state.answer}
+          name="answer"
         />
-      </View>
+        <Button title="Submit" onPress={this.handleSubmit} />
+      </Form>
     );
   }
 }

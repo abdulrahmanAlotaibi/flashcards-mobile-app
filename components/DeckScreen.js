@@ -5,48 +5,71 @@ import {
   Platform,
   Button,
   AsyncStorage,
-  FlatList
+  FlatList,
+  Animated
 } from "react-native";
 import { Logs } from "expo";
-
+import { getDeck } from "../utils/api";
 class DeckScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      deck: null
+      deck: null,
+      opacity: new Animated.Value(0)
     };
-    this.getDeck = this.getDeck.bind(this);
+    this.getSelectedDeck = this.getSelectedDeck.bind(this);
+    this.removeDeck = this.removeDeck.bind(this);
   }
+
   componentDidMount() {
-    this.getDeck();
+    const { opacity } = this.state;
+    Animated.timing(opacity, { toValue: 1, duration: 700 }).start();
+    this.getSelectedDeck();
   }
-  async getDeck() {
-    const data = await AsyncStorage.getItem("decks");
-    const decks = await JSON.parse(data);
-    console.log("!!", decks);
+  // componentDidUpdate() {
+  //   this.getSelectedDeck();
+  // }
+  // componentDidUpdate() {
+  //   this.getSelectedDeck();
+  // }
 
-    const title = await AsyncStorage.getItem("selectedDeck");
-    const selectedDeck = await JSON.parse(title);
-    console.log("selecredDeck:" + selectedDeck);
-
-    const deck = await decks[selectedDeck];
-    console.log("vv>", deck);
-
+  removeDeck() {
+    AsyncStorage.getItem("decks").then(res => {
+      const decks = JSON.parse(res);
+      decks[this.state.deck.title] = undefined;
+      delete decks[this.state.deck.title];
+      AsyncStorage.setItem("decks", JSON.stringify(decks));
+    });
+  }
+  async getSelectedDeck() {
+    const deck = await getDeck();
     this.setState({ deck: deck });
   }
   render() {
-    console.log("=", this.state);
-    if(!this.state.deck){
-        return <View><Text>Empty</Text></View>
+    const {opacity} = this.state;
+    if (!this.state.deck) {
+      return (
+        <Animated.View style={{opacity}}>
+          <Text>Empty</Text>
+        </Animated.View>
+      );
     }
-    const { title,questions } = this.state.deck;
+    const { title, questions } = this.state.deck;
     const cardNumbers = questions.length;
     return (
-      <View>
+      <Animated.View style={{opacity}}>
         <Text>{title}</Text>
-        <Text>{cardNumbers}</Text>
-
-      </View>
+        <Text>{"cards: " + cardNumbers}</Text>
+        <Button
+          title="Add Card"
+          onPress={() => this.props.navigation.navigate("AddCard")}
+        />
+        <Button
+          title="Start Quiz"
+          onPress={() => this.props.navigation.navigate("Quiz")}
+        />
+        <Button title="Delete Deck" onPress={this.removeDeck} />
+      </Animated.View>
     );
   }
 }

@@ -2,74 +2,71 @@ import React, { createContext } from "react";
 import {
   Text,
   View,
-  Platform,
   Button,
   AsyncStorage,
-  FlatList
+  FlatList,
+  Animated
 } from "react-native";
-import styled from "styled-components/native";
 import {
   createAppContainer,
   createStackNavigator,
   createBottomTabNavigator
 } from "react-navigation";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { purple, white } from "./utils/colors";
 import Deck from "./components/Deck";
 import Card from "./components/Card";
 import AddDeck from "./components/AddDeck";
 import DeckScreen from "./components/DeckScreen";
-const DecksList = styled.FlatList`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  border: 1px solid green;
-`;
+import AddCard from "./components/AddCard";
+import Quiz from "./components/Quiz";
+import { getDecks } from "./utils/api";
+import { Main } from "./components/styles/AppStyles";
+import { scheduleNotification } from "./utils/notification";
 
-export const MyContext = React.createContext();
+// Configs
+const NOTIFICATION_KEY = "flashcards:notifications";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       decks: {},
-      selectedDeck: NaN
+      selectedDeck: NaN,
     };
-    this.getDate = this.getDate.bind(this);
-    this.setData = this.setData.bind(this);
+    this.getAllDecks = this.getAllDecks.bind(this);
     this.setSelectedDeck = this.setSelectedDeck.bind(this);
   }
-  componentDidMount() {
-    this.getDate();
-  }
-  setData() {}
-  async setSelectedDeck(id) {
-    try {
-      await AsyncStorage.setItem("selectedDeck", JSON.stringify(id));
-      const data = await AsyncStorage.getItem("selectedDeck");
 
-      const selectedDeck = await JSON.parse(data);
+  componentDidMount() {
+    scheduleNotification();
+    this.getAllDecks();
+  }
+  componentDidUpdate() {
+    this.getAllDecks();
+  }
+
+  async getAllDecks() {
+    try {
+      const decks = await getDecks();
+      this.setState({ decks: decks });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async setSelectedDeck(title) {
+    try {
+      await AsyncStorage.setItem("selectedDeck", JSON.stringify(title));
       this.props.navigation.navigate("DeckScreen");
     } catch (e) {
       console.log(e);
     }
   }
-  getDate = () => {
-    try {
-      const decks = AsyncStorage.getItem("decks").then(res => {
-        this.setState({ decks: JSON.parse(res) });
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   render() {
     if (!this.state.decks)
       return (
         <View>
-          <Text>Not Found</Text>
+          <Text>Empty</Text>
         </View>
       );
     const renderedItems = Object.keys(this.state.decks).map(
@@ -77,47 +74,41 @@ class App extends React.Component {
     );
 
     return (
-      <MyContext.Provider
-        value={{
-          setData: this.setData,
-          getSelectedDeck: this.state.selectedDeck
-        }}
-      >
-        <View>
-          <FlatList
-            data={renderedItems}
-            renderItem={({ item }) => (
-              <Deck
-                title={item.title}
-                key={item.title}
-                setSelectedDeck={this.setSelectedDeck}
-              />
-            )}
-          >
-            <Text>App</Text>
-          </FlatList>
-          <Button
-            title="Go To Deck"
-            onPress={() => this.props.navigation.navigate("Deck")}
-          />
-        </View>
-      </MyContext.Provider>
+      <Main>
+        <FlatList
+          data={renderedItems}
+          renderItem={({ item }) => (
+            <Deck
+              deck={item}
+              title={item.title}
+              key={item.title}
+              setSelectedDeck={this.setSelectedDeck}
+            />
+          )}
+          keyExtractor={item => item.title}
+        ></FlatList>
+      </Main>
     );
   }
 }
+
 const HomeStack = createStackNavigator({
   Home: { screen: App },
   Deck: { screen: AddDeck },
-  DeckScreen: { screen: DeckScreen }
+  DeckScreen: { screen: DeckScreen },
+  Quiz: { screen: Quiz },
+  AddCard: { screen: AddCard }
 });
 const DeckStack = createStackNavigator({
   Home: { screen: HomeStack },
   Deck: { screen: Deck },
+  AddCard: { screen: AddCard },
+  Quiz: { screen: Quiz },
   Card: { screen: Card }
 });
 const Tabs = createBottomTabNavigator({
-  Home: HomeStack,
-  Deck: AddDeck
+  Home: { screen: HomeStack },
+  Deck: { screen: DeckStack }
 });
 
 export default createAppContainer(Tabs);
