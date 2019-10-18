@@ -5,8 +5,8 @@ add flashcards to those decks, then take quizzes on those decks.
 
 ## Installation 
 ```bash
-  npm install
-  npm start
+  yarn install
+  yarn start
 ```
 
 ## Testing Platform: Andriod & IOS using expo
