@@ -17,6 +17,7 @@ class DeckScreen extends Component {
       deck: null,
       opacity: new Animated.Value(0)
     };
+    _isMounted = false;
     this.getSelectedDeck = this.getSelectedDeck.bind(this);
     this.removeDeck = this.removeDeck.bind(this);
   }
@@ -26,11 +27,19 @@ class DeckScreen extends Component {
     };
   };
   componentDidMount() {
+    this._isMounted = true;
     const { opacity } = this.state;
     Animated.timing(opacity, { toValue: 1, duration: 700 }).start();
     this.getSelectedDeck();
   }
-
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+  componentDidUpdate() {
+    if (this._isMounted) {
+      this.getSelectedDeck();
+    }
+  }
   removeDeck() {
     AsyncStorage.getItem("decks").then(res => {
       const decks = JSON.parse(res);
@@ -56,7 +65,7 @@ class DeckScreen extends Component {
     }
     const { title, questions } = this.state.deck;
     const cardNumbers = questions.length;
-    
+
     return (
       <Animated.View style={[{ marginTop: 20 }, { opacity }]}>
         <Text style={{ fontSize: 20, textAlign: "center" }}>{title}</Text>
