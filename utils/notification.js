@@ -1,28 +1,16 @@
 import { Constants, Notifications } from "expo";
 import * as Permissions from "expo-permissions";
+import { AsyncStorage } from "react-native";
 
-askPermissions = async () => {
-  const { status: existingStatus } = await Permissions.getAsync(
-    Permissions.NOTIFICATIONS
+const NOTIFICATION_KEY = "flashcards:notifications";
+
+export function timeToString(time = Date.now()) {
+  const date = new Date(time);
+  const todayUTC = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
   );
-  let finalStatus = existingStatus;
-  if (existingStatus !== granted) {
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-    finalStatus = status;
-  }
-  if (finalStatus !== granted) {
-    return false;
-  }
-  return true;
-};
-
-sendNotificationImmediately = async () => {
-  let notificationId = await Notifications.presentLocalNotificationAsync({
-    title: "study time!",
-    body: "Don't forget to make your flashcards."
-  });
-  console.log(notificationId); // can be saved in AsyncStorage or send to server
-};
+  return todayUTC.toISOString().split("T")[0];
+}
 
 export function clearLocalNotification() {
   return AsyncStorage.removeItem(NOTIFICATION_KEY).then(
@@ -30,21 +18,45 @@ export function clearLocalNotification() {
   );
 }
 
-export const scheduleNotification = async () => {
-  let tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(20);
-  tomorrow.setMinutes(0);
-
-  let notificationId = Notifications.scheduleLocalNotificationAsync(
-    {
-      title: "Study time!",
-      body: "Don't forget to make your flashcards."
+function createNotification() {
+  return {
+    title: "Study Time!",
+    body: "👋 don't forget to study!",
+    ios: {
+      sound: true
     },
-    {
-      repeat: "day",
-      time: tomorrow
+    android: {
+      sound: true,
+      priority: "high",
+      sticky: false,
+      vibrate: true
     }
-  );
-  console.log(notificationId);
-};
+  };
+}
+
+export function setLocalNotification() {
+  AsyncStorage.getItem(NOTIFICATION_KEY)
+    .then(JSON.parse)
+    .then(data => {
+      
+      if (data === null) {
+        Permissions.askAsync(Permissions.NOTIFICATIONS).then(({ status }) => {
+          if (status === "granted") {
+            Notifications.cancelAllScheduledNotificationsAsync();
+
+            let tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(18);
+            tomorrow.setMinutes(0);
+
+            Notifications.scheduleLocalNotificationAsync(createNotification(), {
+              repeat: "day",
+              time: tomorrow
+            });
+
+            AsyncStorage.setItem(NOTIFICATION_KEY, JSON.stringify(true));
+          }
+        });
+      }
+    });
+}

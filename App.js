@@ -5,7 +5,8 @@ import {
   Button,
   AsyncStorage,
   FlatList,
-  Animated
+  Animated,
+  Platform
 } from "react-native";
 import {
   createAppContainer,
@@ -19,26 +20,30 @@ import AddDeck from "./components/AddDeck";
 import DeckScreen from "./components/DeckScreen";
 import AddCard from "./components/AddCard";
 import Quiz from "./components/Quiz";
-import { getDecks } from "./utils/api";
+import { getDecks, getDeck } from "./utils/api";
 import { Main } from "./components/styles/AppStyles";
-import { scheduleNotification } from "./utils/notification";
-
-// Configs
-const NOTIFICATION_KEY = "flashcards:notifications";
+import {
+  setLocalNotification,
+  clearLocalNotification
+} from "./utils/notification";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       decks: {},
-      selectedDeck: NaN,
+      selectedDeck: NaN
     };
     this.getAllDecks = this.getAllDecks.bind(this);
     this.setSelectedDeck = this.setSelectedDeck.bind(this);
   }
-
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: "Decks"
+    };
+  };
   componentDidMount() {
-    scheduleNotification();
+    setLocalNotification();
     this.getAllDecks();
   }
   componentDidUpdate() {
@@ -56,7 +61,9 @@ class App extends React.Component {
   async setSelectedDeck(title) {
     try {
       await AsyncStorage.setItem("selectedDeck", JSON.stringify(title));
-      this.props.navigation.navigate("DeckScreen");
+      this.props.navigation.navigate("DeckScreen", {
+        selectedDeck: getDeck()
+      });
     } catch (e) {
       console.log(e);
     }
@@ -101,14 +108,33 @@ const HomeStack = createStackNavigator({
 });
 const DeckStack = createStackNavigator({
   Home: { screen: HomeStack },
-  Deck: { screen: Deck },
+  ["Add Deck"]: { screen: AddDeck },
+  DeckScreen: { screen: DeckScreen },
   AddCard: { screen: AddCard },
   Quiz: { screen: Quiz },
-  Card: { screen: Card }
+  AddCard: { screen: AddCard }
 });
-const Tabs = createBottomTabNavigator({
-  Home: { screen: HomeStack },
-  Deck: { screen: DeckStack }
-});
+const Tabs = createBottomTabNavigator(
+  {
+    Home: { screen: HomeStack },
+    ["Add Deck"]: { screen: AddDeck }
+  },
+  {
+    tabBarOptions: {
+      activeTintColor: Platform.OS === "ios" ? "#1d1d1d" : "#fff",
+      style: {
+        height: 56,
+        backgroundColor: Platform.OS === "ios" ? "#fff" : "#1d1d1d",
+        shadowColor: "rgba(0, 0, 0, 0.24)",
+        shadowOffset: {
+          width: 0,
+          height: 3
+        },
+        shadowRadius: 6,
+        shadowOpacity: 1
+      }
+    }
+  }
+);
 
 export default createAppContainer(Tabs);

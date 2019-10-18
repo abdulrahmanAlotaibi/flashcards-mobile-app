@@ -25,7 +25,11 @@ class AddCard extends Component {
     this.handleAnswerChange = this.handleAnswerChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: "Add Card"
+    };
+  };
   handleQuestionChange(text) {
     this.setState({ question: text });
   }
@@ -46,13 +50,14 @@ class AddCard extends Component {
     return (
       <Form>
         <TextInput
-          placeholder="Type your Question"
+        
+          placeholder="Type your question"
           onChangeText={text => this.handleQuestionChange(text)}
           value={this.state.question}
           name="question"
         />
         <TextInput
-          placeholder="Type your Ansewr"
+          placeholder="Type your ansewr"
           onChangeText={text => this.handleAnswerChange(text)}
           value={this.state.answer}
           name="answer"

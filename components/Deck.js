@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Button, Animated } from "react-native";
+import { Text, View, Button, Animated,TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
 import { DeckStyles, Title, ButtonStyles } from "./styles/DeckStyles";
 
@@ -23,13 +23,12 @@ class Deck extends Component {
     }
     return (
       <DeckStyles>
-        <View>
+        <TouchableOpacity onPress={this.handlePress}>
           <Title>{this.props.title}</Title>
-          <Text>
-            {this.props.deck.questions ? this.props.deck.questions.length : 0}
+          <Text style={{textAlign:"center"}}>
+             { this.props.deck.questions ? this.props.deck.questions.length : 0} cards
           </Text>
-          <ButtonStyles title="Show Deck" onPress={() => this.handlePress()} />
-        </View>
+        </TouchableOpacity>
       </DeckStyles>
     );
   }

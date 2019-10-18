@@ -29,14 +29,21 @@ class AddDeck extends Component {
   }
   render() {
     return (
-      <View>
-        <Text>What is the title?</Text>
+      <View style={{ marginTop: 50 }}>
+        <Text style={{ fontSize: 20, textAlign: "center" }}>
+          What is the title of your new deck?
+        </Text>
         <TextInput
-          placeholder="Type your Title"
+          style={{
+            marginBottom: 10,
+            borderBottomWidth: 1,
+            height: 40
+          }}
+          placeholder="Deck Title"
           onChangeText={text => this.handleChange(text)}
           value={this.state.term}
         />
-        <Button title="Submit" onPress={this.handleSubmit} />
+        <Button title="Create Deck" onPress={this.handleSubmit} />
       </View>
     );
   }
