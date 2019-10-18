@@ -9,4 +9,4 @@ add flashcards to those decks, then take quizzes on those decks.
   yarn start
 ```
 
-## Testing Platform: Andriod & IOS using expo
+## Testing Platform: Andriod using expo
