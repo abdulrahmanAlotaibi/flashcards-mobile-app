@@ -52,7 +52,9 @@ class DeckScreen extends Component {
   }
   async getSelectedDeck() {
     const deck = await getDeck();
-    this.setState({ deck: deck });
+    if (this._isMounted) {
+      this.setState({ deck: deck });
+    }
   }
   render() {
     const { opacity } = this.state;

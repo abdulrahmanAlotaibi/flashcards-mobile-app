@@ -34,22 +34,30 @@ class App extends React.Component {
       decks: {},
       selectedDeck: NaN
     };
+    _isMounted = false;
     this.getAllDecks = this.getAllDecks.bind(this);
     this.setSelectedDeck = this.setSelectedDeck.bind(this);
   }
+
   static navigationOptions = ({ navigation }) => {
     return {
       title: "Decks"
     };
   };
   componentDidMount() {
+    this._isMounted = true;
     setLocalNotification();
     this.getAllDecks();
   }
+  
   componentDidUpdate() {
-    this.getAllDecks();
+    if(this._isMounted){
+      this.getAllDecks();
+    }
   }
-
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
   async getAllDecks() {
     try {
       const decks = await getDecks();

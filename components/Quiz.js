@@ -45,13 +45,15 @@ class Quiz extends Component {
   }
   handlePress() {
     this.setState(currState => ({
-      questionNumber: currState.questionNumber + 1
+      questionNumber: currState.questionNumber + 1,
+      isAnswer: false
     }));
   }
   increaseCorrectTracker() {
     this.setState(currState => ({
       correctTracker: currState.correctTracker + 1,
-      questionNumber: currState.questionNumber + 1
+      questionNumber: currState.questionNumber + 1,
+      isAnswer: false
     }));
   }
   async showAnswer() {
